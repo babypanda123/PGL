@@ -1,3 +1,4 @@
+
 #ifndef PGL_H
 #define PGL_H
 
@@ -9,13 +10,16 @@
 #include "esp_log.h"
 #include "esp_system.h"
 #include <cstring>
+#include <string>
 
-class SimpleBluetoothSerial {
+class PGL {
 public:
-    SimpleBluetoothSerial();
+    PGL();
     
     bool begin(const char* deviceName);
     size_t write(uint8_t c);
+    size_t println(const String &str);
+    size_t print(const String &str);
     int available();
     int read();
     
