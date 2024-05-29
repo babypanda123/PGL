@@ -16,8 +16,9 @@ bool PGL::begin(const char* deviceName) {
     esp_spp_register_callback(spp_callback);
     esp_spp_init(ESP_SPP_MODE_CB);
     
-    esp_bt_dev_set_device_name(deviceName);
-    esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
+    esp_bt_dev_set_device_name(deviceName); // 변경: Scan mode 설정 대신에 device name 설정
+    // 변경: Scan mode 설정 대신에 device name 설정
+    //esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
     
     return true;
 }
@@ -29,7 +30,17 @@ size_t PGL::write(uint8_t c) {
     return 1;
 }
 
-size_t PGL::print(const String &str) {
+size_t PGL::print(const int &val) {
+    size_t len = 0;
+    if (_spp_client) {
+        char buffer[20]; // 정수를 문자열로 변환하기 위한 버퍼 크기
+        len = snprintf(buffer, sizeof(buffer), "%d", val);
+        esp_spp_write(_spp_client, len, (uint8_t*)buffer);
+    }
+    return len;
+}
+
+size_t PGL::print(const std::string &str) {
     size_t len = str.length();
     if (_spp_client) {
         esp_spp_write(_spp_client, len, (uint8_t*)str.c_str());
@@ -37,7 +48,7 @@ size_t PGL::print(const String &str) {
     return len;
 }
 
-size_t PGL::println(const String &str) {
+size_t PGL::println(const std::string &str) {
     size_t len = print(str);
     if (_spp_client) {
         esp_spp_write(_spp_client, 1, (uint8_t*)"\n");
